@@ -2,6 +2,7 @@
 
 Explorateur Multi-Cloud
 
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Build Status](https://travis-ci.org/multi-cloud-explorer/mce-django-server.svg)](https://travis-ci.org/multi-cloud-explorer/mce-django-server)
 [![Coverage Status](https://coveralls.io/repos/multi-cloud-explorer/mce-django-server/badge.svg?branch=master&service=github)](https://coveralls.io/github/multi-cloud-explorer/mce-django-server?branch=master)
 [![Code Health](https://landscape.io/github/multi-cloud-explorer/mce-django-server/master/landscape.svg?style=flat)](https://landscape.io/github/multi-cloud-explorer/mce-django-server/master)
