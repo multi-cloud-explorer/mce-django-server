@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     'corsheaders',
 
     'django_q',
-    'django_db_logger',
 
     'mce_django_app',
     'mce_tasks_djq',
@@ -123,6 +122,8 @@ SITE_ID = env('MCE_SITE_ID', default=1, cast=int)
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 
+# TODO: env settings pour enable/disable db logger et autres
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
@@ -141,27 +142,23 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'debug' # TODO: debug if debug: ? simple https://docs.djangoproject.com/fr/2.2/topics/logging/
         },
-        'db_log': {
-            #'level': 'DEBUG',
-            'class': 'django_db_logger.db_log_handler.DatabaseLogHandler'
-        },
+        #'db_log': {
+        #    #'level': 'DEBUG',
+        #    'class': 'mce_django_app.db_log_handler.DatabaseLogHandler'
+        #},
     },
     'loggers': {
         '': {
-            'handlers': ['console', 'db_log'],
+            'handlers': ['console'], #'db_log'],
             'level': env('MCE_LOG_LEVEL', default='DEBUG'),
             'propagate': False,
         },
         'urllib3': {'level': 'ERROR'},
-        'smbprotocol': {'level': 'WARN'},
         'chardet': {'level': 'WARN'},
         'cchardet': {'level': 'WARN'},
     },
 }
 
-
-#DJANGO_DB_LOGGER_ADMIN_LIST_PER_PAGE: integer. list per page in admin view. default 10
-#DJANGO_DB_LOGGER_ENABLE_FORMATTER: boolean. Using formatter options to format message.``True`` or False, default False
 
 CORS_ORIGIN_ALLOW_ALL = True
 
@@ -203,3 +200,6 @@ Q_CLUSTER = {
     'label': 'Django Q',
     #'broker_class: 'myapp.broker.CustomBroker'
 }
+
+DJANGO_DB_LOGGER_ADMIN_LIST_PER_PAGE = 10
+DJANGO_DB_LOGGER_ENABLE_FORMATTER = False
