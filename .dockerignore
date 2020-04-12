@@ -1,0 +1,13 @@
+.env
+data/
+.git/
+.vscode/
+archives/
+*.egg-info
+.coverage
+.travis.yml
+Dockerfile*
+.pytest_cache
+tests/
+TODO.md
+README.md
