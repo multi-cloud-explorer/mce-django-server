@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+{% load bootstrap4 %}
+{% load static %}
+{% if 'use_i18n'|bootstrap_setting %}
+    {% load i18n %}
+    {% get_current_language as LANGUAGE_CODE %}
+{% endif %}
+<html lang="{{ LANGUAGE_CODE|default:'en_us' }}">
+
+<head>
+
+    <title>{% block title %}Multi-Cloud-Explorer{% endblock %}</title>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <!--
+    <link rel="stylesheet" href="{% static "app/font-awesome/5.8.2/all.min.css" %}">
+    <link rel="stylesheet" href="{% static "app/bootstrap/4.3.1/bootstrap.min.css" %}">
+    -->
+    {% bootstrap_css %}
+
+    {% block bootstrap4_extra_head %}
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+    {% endblock %}
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+    </style>
+
+    <link href="{% static "mce-server/dashboard.css" %}" rel="stylesheet">
+
+</head>
+
+<body>
+
+{% bootstrap_messages %}
+
+{% block menu_left %}
+
+<nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+  <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Multi Cloud Explorer</a>
+  <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
+  <ul class="navbar-nav px-3">
+    <li class="nav-item text-nowrap">
+      <a class="nav-link" href="#">Sign out</a>
+    </li>
+  </ul>
+</nav>
+
+<div class="container-fluid">
+  <div class="row">
+    <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+      <div class="sidebar-sticky">
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link active" href="#">
+              <span data-feather="home"></span>
+              Dashboard <span class="sr-only">(current)</span>
+            </a>
+          </li>
+          <!--
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file"></span>
+              Orders
+            </a>
+          </li>
+          -->
+        </ul>
+
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+          <span>Azure</span>
+        </h6>
+        <ul class="nav flex-column mb-2">
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file-text"></span>
+              Subscriptions
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file-text"></span>
+              Groups
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file-text"></span>
+              Resources
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file-text"></span>
+              Changes
+            </a>
+          </li>
+        </ul><!-- end azure block -->
+
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+          <span>Admin</span>
+        </h6>
+        <ul class="nav flex-column mb-2">
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file-text"></span>
+              Accounts
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file-text"></span>
+              Tasks
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file-text"></span>
+              Settings
+            </a>
+          </li>
+        </ul><!-- end admin block -->
+
+      </div>
+    </nav>
+  </div>
+</div>
+{% endblock %}
+
+{% block bootstrap4_before_content %}{% endblock %}
+{% block bootstrap4_content %}{% endblock %}
+{% block bootstrap4_after_content %}{% endblock %}
+
+{% bootstrap_javascript jquery='full' %}
+<!--
+<script src="{% static "app/jquery/jquery-3.3.1.min.js" %}"></script>
+<script src="{% static "app/bootstrap/4.3.1/popper.min.js" %}"></script>
+<script src="{% static "app/bootstrap/4.3.1/bootstrap.min.js" %}"></script>
+-->
+
+{% block bootstrap4_extra_script %}
+  <!--<script src="{% static "app/bootbox/5.2.0/bootbox.all.min.js" %}"></script>-->
+{% endblock %}
+</body>
+
+</html>
+

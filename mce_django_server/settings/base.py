@@ -1,4 +1,5 @@
 import os
+import tempfile
 import environ
 
 env = environ.Env(DEBUG=(bool, False))
@@ -15,6 +16,10 @@ PROJECT_DIR = os.path.abspath(os.path.join(BASE_DIR, '..'))
 SECRET_KEY = env('MCE_SECRET_KEY', default='fa(=utzixi05twa3j*v$eaccuyq)!-_c-8=sr#hih^7i&xcw)^')
 
 DEBUG = env('MCE_DEBUG', default=False, cast=bool)
+
+ROLLBAR_ENABLE = env('MCE_ROLLBAR_ENABLE', default=False, cast=bool)
+
+ROLLBAR_TOKEN = env('MCE_ROLLBAR_TOKEN', default=None)
 
 #ALLOWED_HOSTS = ["*"]
 
@@ -40,6 +45,8 @@ INSTALLED_APPS = [
 
     'django_q',
 
+    'bootstrap4',
+
     'mce_django_app',
     'mce_tasks_djq',
     
@@ -48,6 +55,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -62,14 +70,26 @@ ROOT_URLCONF = 'mce_django_server.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
+        'DIRS': [
+             os.path.join(BASE_DIR, 'templates'),
+        ],
+        'APP_DIRS': False,
         'OPTIONS': {
             'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
+                'django.template.context_processors.debug',
+                'django.template.context_processors.i18n',
+                'django.template.context_processors.media',
+                'django.template.context_processors.static',
+                'django.template.context_processors.tz',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.request',
+            ],
+            'loaders': [
+                ('django.template.loaders.cached.Loader', [
+                    'django.template.loaders.filesystem.Loader',
+                    'django.template.loaders.app_directories.Loader',
+                ])
             ],
         },
     },
@@ -117,6 +137,12 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+STATICFILES_DIRS = [
+    ('mce-server', os.path.join(BASE_DIR, 'project_static'))
+]
+
+MEDIA_ROOT = tempfile.gettempdir()
 
 SITE_ID = env('MCE_SITE_ID', default=1, cast=int)
 
@@ -203,3 +229,23 @@ Q_CLUSTER = {
 
 DJANGO_DB_LOGGER_ADMIN_LIST_PER_PAGE = 10
 DJANGO_DB_LOGGER_ENABLE_FORMATTER = False
+
+if ROLLBAR_ENABLE and ROLLBAR_TOKEN:
+    MIDDLEWARE.append('rollbar.contrib.django.middleware.RollbarNotifierMiddleware')
+    ROLLBAR = {
+        'access_token': ROLLBAR_TOKEN,
+        'environment': 'development' if DEBUG else 'production',
+        'root': BASE_DIR,
+    }
+    import rollbar
+    rollbar.init(**ROLLBAR)
+
+
+BOOTSTRAP4 = {
+    "error_css_class": "bootstrap4-error",
+    "required_css_class": "bootstrap4-required",
+    "javascript_in_head": True,
+    "include_jquery": True,
+}
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

@@ -27,9 +27,6 @@ black = "*"
 wheel = "*"
 
 [packages]
-mce-django-app = {git = "https://github.com/multi-cloud-explorer/mce-django-app.git",ref = "master"}
-mce-lib-azure = {git = "https://github.com/multi-cloud-explorer/mce-lib-azure.git",ref = "master"}
-mce-tasks-djq = {git = "https://github.com/multi-cloud-explorer/mce-tasks-djq.git",ref = "master"}
 mce-django-server = {editable = true,path = "."}
 gevent = "*"
 gevent-openssl = "*"
@@ -63,6 +60,10 @@ psycogreen = "*"
 azure-mgmt-resource = "*"
 boto3 = "*"
 google-cloud-resource-manager = "*"
+cloud-explorer-azure = {path = "./../mce-lib-azure"}
+rollbar = "*"
+django-bootstrap4 = "*"
+whitenoise = "*"
 
 [requires]
 python_version = "3.7"

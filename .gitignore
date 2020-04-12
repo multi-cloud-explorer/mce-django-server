@@ -1,3 +1,4 @@
+build/
 backend/apps/
 id_rsa_*
 
