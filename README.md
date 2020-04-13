@@ -34,8 +34,11 @@
 git clone https://github.com/multi-cloud-explorer/mce-django-server.git
 cd mce-django-server
 
-export COMPOSE_FILE=docker-compose.yml:docker-compose.prod.yml
-docker-compose up -d --build
+docker-compose up -d
+
+# Avec le proxy treafik (mettez à jour les label pour l'entrée app
+export COMPOSE_FILE=docker-compose.yml:docker-compose.traefik.yml
+docker-compose up -d
 
 # Vérifiez l'état des services
 docker-compose ps

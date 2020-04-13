@@ -36,24 +36,26 @@ services:
     command: redis-server --appendonly yes
 
   app:
+    image: multicloudexplorer/mce-django-server:latest
     environment: &global_env
-      - CACHE_URL=rediscache://redis:6379/0?client_class=django_redis.client.DefaultClient
+      - CACHE_URL=rediscache://redis:6379/0
       - DATABASE_URL=psql://mce:password@postgres/mce
       - DJANGO_SETTINGS_MODULE=mce_django_server.settings.prod
       - DEBUG=false
       - LOG_LEVEL=INFO
       - TZ=Europe/Paris
-    command: bash -c "./manage.py check && ./manage.py migrate && gunicorn --workers 1 -k gevent --bind 0.0.0.0:8000 mce_django_server.wsgi:application"
+    command: bash -c "./manage.py check && ./manage.py migrate && gunicorn -c /code/gunicorn_settings.py mce_django_server.wsgi:application"
     links:
       - redis
       - postgres
-    #labels:
-    #  - traefik.enable=true
-    #  - traefik.backend=app
-    #  - traefik.frontend.rule=Host:demo.multi-cloud-explorer.org
-    #  - traefik.port=8000
+    labels:
+      - traefik.enable=true
+      - traefik.backend=app
+      - traefik.frontend.rule=Host:demo.multi-cloud-explorer.org
+      - traefik.port=8000
 
   worker:
+    image: multicloudexplorer/mce-django-server:latest
     environment: *global_env
     command: bash -c "./manage.py qcluster"
     volumes:

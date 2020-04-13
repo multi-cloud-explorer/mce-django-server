@@ -9,7 +9,7 @@ services:
   app:
     build:
       context: .
-      image: mce-django-server:latest
+      image: multicloudexplorer/mce-django-server:dev
       environment:
         - DJANGO_SETTINGS_MODULE=mce_django_server.settings.dev
         - DATABASE_URL=psql://mce:password@postgres/mcedev
@@ -21,7 +21,7 @@ services:
         - 8000:8000
 
   worker:
-      image: mce-django-server:latest
+      image: multicloudexplorer/mce-django-server:dev
       environment:
         - DJANGO_SETTINGS_MODULE=mce_django_server.settings.dev
         - DATABASE_URL=psql://mce:password@postgres/mcedev

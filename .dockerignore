@@ -1,9 +1,6 @@
 .env
-data/
-.git/
-.vscode/
+terraform/
 archives/
-*.egg-info
 .coverage
 .travis.yml
 Dockerfile*
@@ -11,3 +8,5 @@ Dockerfile*
 tests/
 TODO.md
 README.md
+docker-compose*
+LICENSE

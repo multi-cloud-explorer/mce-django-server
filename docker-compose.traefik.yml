@@ -2,12 +2,6 @@ version: '3.7'
 
 services:
 
-  app:
-    image: mce-django-server:latest
-
-  worker:
-    image: mce-django-server:latest
-
   traefik:
     image: "traefik:1.7-alpine"
     ports:
