@@ -152,7 +152,7 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': True,
+    'disable_existing_loggers': False,
     'formatters': {
         'debug': {
             'format': '%(asctime)s - [%(name)s] - [%(process)d] - [%(module)s] - [line:%(lineno)d] - [%(levelname)s] - %(message)s',
@@ -166,16 +166,12 @@ LOGGING = {
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
-            'formatter': 'debug' # TODO: debug if debug: ? simple https://docs.djangoproject.com/fr/2.2/topics/logging/
+            'formatter': 'debug' if DEBUG else 'simple'
         },
-        #'db_log': {
-        #    #'level': 'DEBUG',
-        #    'class': 'mce_django_app.db_log_handler.DatabaseLogHandler'
-        #},
     },
     'loggers': {
         '': {
-            'handlers': ['console'], #'db_log'],
+            'handlers': ['console'],
             'level': env('MCE_LOG_LEVEL', default='DEBUG'),
             'propagate': False,
         },
