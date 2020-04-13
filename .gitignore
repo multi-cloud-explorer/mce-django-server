@@ -1,10 +1,7 @@
 build/
-backend/apps/
 id_rsa_*
-
 *.tfstate*
 .terraform/
-
 TODO.md
 .venv/
 .coverage
