@@ -1,14 +1,5 @@
 #!/usr/bin/env python3
 
-from gevent import monkey
-monkey.patch_all(thread=True)
-
-import gevent_openssl
-gevent_openssl.monkey_patch()
-
-#from psycogreen.gevent import patch_psycopg
-#patch_psycopg()
-
 import os, sys
 
 def main():
