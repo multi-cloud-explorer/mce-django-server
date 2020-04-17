@@ -7,7 +7,7 @@ TODO.md
 .coverage
 coverage.xml
 *.egg-info
-.env
+.env*
 *.pid
 .venv/
 archives/

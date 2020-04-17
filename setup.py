@@ -1,8 +1,9 @@
 from setuptools import setup, find_packages
 
 install_requires = [
+    'uvicorn',
+    'uvloop',
     'gevent',
-    'gevent-openssl',
     'python-dotenv',
     'Pillow',
     'python-decouple',
@@ -14,23 +15,22 @@ install_requires = [
     'django-cryptography',
     'django-select2',
     'django-model-utils',
-    'django-bootstrap4',
+    'django-material-admin',
+    'django-crispy-forms',
+
     'whitenoise',
     'rollbar',
-    'gunicorn',
 
     'djangorestframework',
-    'dj-database-url',
     'django-cors-headers',
     'djoser',
     'drf-yasg',
 
     'hiredis',
-    'django-redis-cache',
+    'django-redis',
 
-    'django-q',
     'mce-django-app@git+https://github.com/multi-cloud-explorer/mce-django-app.git@master#egg=mce_django_app',
-    'mce-tasks-djq@git+https://github.com/multi-cloud-explorer/mce-tasks-djq.git@master#egg=mce_tasks_djq',
+    'mce-tasks-rq@git+https://github.com/multi-cloud-explorer/mce-tasks-rq.git@master#egg=mce_tasks_rq',
 ]
 
 tests_requires = [
@@ -56,6 +56,7 @@ dev_requires = [
     'autopep8',
     'black',
     'wheel',
+    'django-debug-toolbar',
 ]
 
 extras_requires = {
@@ -63,9 +64,12 @@ extras_requires = {
     'dev': dev_requires,
     'psql': [
         'psycopg2-binary',
-        'psycogreen',
-        'django-db-geventpool',
-    ]
+        #'psycogreen',
+        #'django-db-geventpool',
+    ],
+   'mysql': [
+        'mysqlclient',
+   ]
 }
 
 setup(
@@ -74,8 +78,8 @@ setup(
     description='Django Server for Multi Cloud Explorer',
     license='GPLv3+',
     url='https://github.com/multi-cloud-explorer/mce-django-server.git',
-    packages=find_packages(),
-    include_package_data=True, 
+    packages=find_packages(exclude=("tests",)),
+    include_package_data=False, 
     tests_require=tests_requires,
     install_requires=install_requires,
     extras_require=extras_requires,

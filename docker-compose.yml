@@ -14,7 +14,7 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 172.16.238.0/24
+        - subnet: 172.16.239.0/24
 
 services:
 
@@ -34,17 +34,20 @@ services:
     volumes:
       - redis_data:/data
     command: redis-server --appendonly yes
+    restart: unless-stopped
 
   app:
     image: multicloudexplorer/mce-django-server:latest
     environment: &global_env
-      - CACHE_URL=rediscache://redis:6379/0
+      - CACHE_URL=redis://redis:6379/0
       - DATABASE_URL=psql://mce:password@postgres/mce
       - DJANGO_SETTINGS_MODULE=mce_django_server.settings.prod
       - DEBUG=false
       - LOG_LEVEL=INFO
       - TZ=Europe/Paris
-    command: bash -c "./manage.py check && ./manage.py migrate && gunicorn -c /code/gunicorn_settings.py mce_django_server.wsgi:application"
+      - MCE_ROLLBAR_ENABLE=false
+      #- MCE_ROLLBAR_TOKEN=
+    command: bash -c "./manage.py migrate && uvicorn --workers 2 --loop uvloop --proxy-headers --log-level info --host 0.0.0.0 --port 8000 mce_django_server.asgi:application"
     links:
       - redis
       - postgres
@@ -53,11 +56,13 @@ services:
       - traefik.backend=app
       - traefik.frontend.rule=Host:demo.multi-cloud-explorer.org
       - traefik.port=8000
+    ports:
+      - 127.0.0.1:8000:8000
 
   worker:
     image: multicloudexplorer/mce-django-server:latest
     environment: *global_env
-    command: bash -c "./manage.py qcluster"
+    command: bash -c "./manage.py rqworker --with-scheduler"
     volumes:
       - common_data:/shared
     links:
@@ -65,6 +70,25 @@ services:
       - postgres
     depends_on:
       - app
+
+  rq-dashboard:
+    image: eoranged/rq-dashboard
+    environment:
+      - RQ_DASHBOARD_REDIS_URL=redis://redis:6379
+      - RQ_DASHBOARD_USERNAME=rq
+      - RQ_DASHBOARD_PASSWORD=password
+    command: bash -c "./manage.py rqworker --with-scheduler"
+    volumes:
+      - common_data:/shared
+    links:
+      - redis
+    labels:
+      - traefik.enable=true
+      - traefik.backend=app
+      - traefik.frontend.rule=Host:demo-rq-dashboard.multi-cloud-explorer.org
+      - traefik.port=9181
+    ports:
+      - 127.0.0.1:9181:9181
 
 
 

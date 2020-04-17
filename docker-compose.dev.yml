@@ -9,24 +9,28 @@ services:
   app:
     build:
       context: .
-      image: multicloudexplorer/mce-django-server:dev
-      environment:
-        - DJANGO_SETTINGS_MODULE=mce_django_server.settings.dev
-        - DATABASE_URL=psql://mce:password@postgres/mcedev
-        - DEBUG=true
-        - LOG_LEVEL=DEBUG
-      volumes:
-        - .:/code:ro
-      ports:
-        - 8000:8000
+    image: multicloudexplorer/mce-django-server:dev
+    environment:
+      - DJANGO_SETTINGS_MODULE=mce_django_server.settings.dev
+      - DATABASE_URL=psql://mce:password@postgres/mcedev
+      - DEBUG=true
+      - LOG_LEVEL=DEBUG
+    volumes:
+      - .:/code:ro
+    ports:
+      - 8000:8000
 
   worker:
-      image: multicloudexplorer/mce-django-server:dev
-      environment:
-        - DJANGO_SETTINGS_MODULE=mce_django_server.settings.dev
-        - DATABASE_URL=psql://mce:password@postgres/mcedev
-        - DEBUG=true
-        - LOG_LEVEL=DEBUG
-      volumes:
-        - .:/code:ro
+    image: multicloudexplorer/mce-django-server:dev
+    environment:
+      - DJANGO_SETTINGS_MODULE=mce_django_server.settings.dev
+      - DATABASE_URL=psql://mce:password@postgres/mcedev
+      - DEBUG=true
+      - LOG_LEVEL=DEBUG
+    volumes:
+      - .:/code:ro
+
+  rq-dashboard:
+    ports:
+      - 9181:9181
 

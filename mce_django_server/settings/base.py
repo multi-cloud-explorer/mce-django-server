@@ -1,6 +1,8 @@
 import os
 import tempfile
+
 import environ
+from django.utils.translation import gettext_lazy as _
 
 env = environ.Env(DEBUG=(bool, False))
 
@@ -24,17 +26,19 @@ ROLLBAR_TOKEN = env('MCE_ROLLBAR_TOKEN', default=None)
 #ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
+    'material.admin',
+    'material.admin.default',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.sites',
+    #'django.contrib.sites',
     'django.contrib.humanize',
 
     'django_select2',
     'django_filters',
+    'crispy_forms',
 
     'django_extensions',
     'rest_framework',
@@ -43,14 +47,17 @@ INSTALLED_APPS = [
     'drf_yasg',
     'corsheaders',
 
-    'django_q',
+    #'allauth',
+    #'allauth.account',
+    #'allauth.socialaccount',
 
-    'bootstrap4',
-
+    'django_rq',
+    'mce_tasks_rq',
     'mce_django_app',
-    'mce_tasks_djq',
-    
 ]
+
+if DEBUG:
+    INSTALLED_APPS.append('django.contrib.admindocs')
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -97,14 +104,32 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'mce_django_server.wsgi.application'
 
+#CACHES = {
+#    'default': {
+#        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+#        'LOCATION': 'unique-snowflake',
+#    }
+#}
 CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'unique-snowflake',
-    }
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/0",
+        #"OPTIONS": {
+        #    "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        #}
+    },
 }
 
+AUTH_USER_MODEL = 'mce_django_app.User'
+
 LOGIN_URL = 'admin:login'
+#LOGIN_URL = '/accounts/login/'
+#LOGIN_REDIRECT_URL = '/'
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    #'allauth.account.auth_backends.AuthenticationBackend',
+)
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -121,16 +146,22 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 LOCALE_PATHS = ( os.path.join(BASE_DIR, 'locale'), )
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGES = [
+  ('fr', _('Français')),
+  ('en', _('Anglais')),
+]
+
+LANGUAGE_CODE = 'fr'
 
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
 USE_L10N = True
+
+USE_THOUSAND_SEPARATOR = True
 
 USE_TZ = True
 
@@ -146,7 +177,9 @@ MEDIA_ROOT = tempfile.gettempdir()
 
 SITE_ID = env('MCE_SITE_ID', default=1, cast=int)
 
-SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
+#SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"
 
 # TODO: env settings pour enable/disable db logger et autres
 
@@ -190,6 +223,11 @@ REST_FRAMEWORK = {
         #'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+        # 'rest_framework.permissions.AllowAny'
+        'rest_framework.permissions.IsAuthenticated',
+    ],
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
@@ -207,22 +245,6 @@ REST_FRAMEWORK = {
     ],
 }
 
-Q_CLUSTER = {
-    'name': 'myproject',
-    'workers': 4,
-    'orm': 'default',
-    'bulk': 10, # fetch 10 tasks from broker
-    'retry': 5,
-    'recycle': 500,
-    'timeout': 60,
-    'compress': True,
-    'save_limit': 250,
-    #'queue_limit': 500, # 'workers' value ** 2
-    'cpu_affinity': 1,
-    'label': 'Django Q',
-    #'broker_class: 'myapp.broker.CustomBroker'
-}
-
 DJANGO_DB_LOGGER_ADMIN_LIST_PER_PAGE = 10
 DJANGO_DB_LOGGER_ENABLE_FORMATTER = False
 
@@ -236,12 +258,78 @@ if ROLLBAR_ENABLE and ROLLBAR_TOKEN:
     import rollbar
     rollbar.init(**ROLLBAR)
 
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-BOOTSTRAP4 = {
-    "error_css_class": "bootstrap4-error",
-    "required_css_class": "bootstrap4-required",
-    "javascript_in_head": True,
-    "include_jquery": True,
+#CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+SWAGGER_SETTINGS = {
+    #'LOGIN_URL': reverse_lazy('admin:login'),
+    #'LOGOUT_URL': '/admin/logout',
+    'PERSIST_AUTH': True,
+    'REFETCH_SCHEMA_WITH_AUTH': True,
+    'REFETCH_SCHEMA_ON_LOGOUT': True,
+
+    #'DEFAULT_INFO': 'testproj.urls.swagger_info',
+
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'in': 'header',
+            'name': 'Authorization',
+            'type': 'apiKey',
+        },
+        #'OAuth2 password': {
+        #    'flow': 'password',
+        #    'scopes': {
+        #        'read': 'Read everything.',
+        #        'write': 'Write everything,',
+        #    },
+        #    'tokenUrl': OAUTH2_TOKEN_URL,
+        #    'type': 'oauth2',
+        #},
+        'Query': {
+            'in': 'query',
+            'name': 'auth',
+            'type': 'apiKey',
+        },
+    },
+    #'OAUTH2_REDIRECT_URL': OAUTH2_REDIRECT_URL,
+    #'OAUTH2_CONFIG': {
+    #    'clientId': OAUTH2_CLIENT_ID,
+    #    'clientSecret': OAUTH2_CLIENT_SECRET,
+    #    'appName': OAUTH2_APP_NAME,
+    #},
+    #"DEFAULT_PAGINATOR_INSPECTORS": [
+    #    'testproj.inspectors.UnknownPaginatorInspector',
+    #    'drf_yasg.inspectors.DjangoRestResponsePagination',
+    #    'drf_yasg.inspectors.CoreAPICompatInspector',
+    #]
 }
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+MATERIAL_ADMIN_SITE = {
+    'HEADER':  _("Multi-Cloud-Explorer Administration"),
+    'TITLE':  _('Multi-Cloud-Explorer'),
+    'SHOW_THEMES':  False,
+    'TRAY_REVERSE': False, 
+    'NAVBAR_REVERSE': False,  
+    'SHOW_COUNTS': True, 
+    'APP_ICONS': {  
+        'sites': 'send',
+        'mce_django_app': 'web',
+    },
+    'MODEL_ICONS': {  # Set icons for models(lowercase), including 3rd party models, {'model_name': 'material_icon_name', ...}
+        'site': 'contact_mail',
+    }
+}
+
+RQ_QUEUES = {
+    'default': {
+        'USE_REDIS_CACHE': 'default',
+    }
+}
+
+RQ = {
+    'DEFAULT_RESULT_TTL': 86400, # 24H
+    #'BURST': True,
+    'SHOW_ADMIN_LINK': True
+}
+
